@@ -1,0 +1,21 @@
+{% for node in item.nodes %}
+
+resource "proxmox_vm_qemu" "{{ item.uuid }}-{{ loop.index }}" {
+    name = "den-{{node.name}}-{{ loop.index }}"
+    desc = "{{ item.uuid }} - {{ node.name }} - SGW{{ loop.index }}" 
+    target_node = "{{ PROXMOX_HOST }}"
+    clone = "{{ TEMPLATE_NAME }}"
+    full_clone = true
+    cores = {{ vm_config.cores }}
+    sockets = 1
+    memory = {{ vm_config.memory }}
+    boot = "cdn"
+    bootdisk = "scsi0"
+
+    vga {
+        type = "serial0"
+    }
+
+}
+
+{% endfor %}

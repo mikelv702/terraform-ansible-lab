@@ -1,0 +1,5 @@
+---
+# tasks file for terraform_plan
+- name: Virtual Machiens
+  include_tasks: 'create-vm.yml'
+  loop: "{{ gateways }}"

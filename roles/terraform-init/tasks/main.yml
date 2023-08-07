@@ -1,0 +1,4 @@
+---
+# tasks file for terraform-init
+
+- include_tasks: terraform.yml

@@ -1,0 +1,4 @@
+---
+# vars file for terraform_plan
+PROXMOX_HOST: "pve"
+TEMPLATE_NAME: "ubuntu-template"

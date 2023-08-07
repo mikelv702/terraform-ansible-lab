@@ -1,0 +1,29 @@
+- name: Managed Virtual Machine
+  block:
+    - name: plan exists
+      stat:
+        path: "/opt/vm-config/terraform/{{ item.uuid }}.tf"
+      register: plan_exists
+
+    - name: Items State and Plan
+      debug:
+        msg: "Plan: {{ plan_exists.stat.exists }} Item State: {{ item.state }}"
+
+    - name: create terraform plan file
+      template:
+        src: plan.tf.j2
+        dest: "/opt/vm-config/terraform/{{ item.uuid }}.tf"
+        owner: root
+        group: root
+        mode: '0644'
+      when: not plan_exists.stat.exists and item.state == "present"
+    
+    - name: Terraform apply {{ item.uuid }}
+      shell: terraform apply --auto-approve --target proxmox_vm_qemu.{{ item.uuid }}-{{ idx + 1}}
+      args:
+        chdir: /opt/vm-config/terraform
+      loop: "{{ item.nodes }}"
+      loop_control:
+        loop_var: _item
+        index_var: idx
+      when: not plan_exists.stat.exists and item.state == "present"
