@@ -1,0 +1,34 @@
+---
+- name: stop gateways
+  when: item.state == "stopped"
+  block:
+    - name: stop vms
+      proxmox_kvm:
+        api_user: "{{ pve_credentials.api_user }}"
+        api_password: "{{ pve_credentials.api_password }}"
+        api_host: "{{ pve_nodes[0] }}"
+        name: "den-{{ _item.name }}-{{ idx + 1}}"
+        state: stopped
+      loop: "{{ item.nodes }}"
+      loop_control:
+        loop_var: _item
+        index_var: idx
+
+
+- name: remove gateway, and ceph auth keys
+  when: item.state == "absent" or item.state == "purged"
+  block:
+    - name: destroy vms with terraform
+      shell: terraform destroy --auto-approve --target proxmox_vm_qemu.{{ item.uuid }}-{{ idx + 1}}
+      args:
+        chdir: /opt/vm-config/terraform
+      loop: "{{ item.nodes }}"
+      loop_control:
+        loop_var: _item
+        index_var: idx
+
+    - name: destroy terraform plan locally stored
+      file:
+        path: "/opt/vm-config/terraform/{{ item.uuid }}.tf"
+        state: absent    
+

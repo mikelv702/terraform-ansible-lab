@@ -17,6 +17,7 @@ pve_nodes:
 #  - pve-demo3
 
 pve_credentials:
+  api_user: ""
   api_endpoint: ""
   api_token_id: ""
   api_secret: ""
